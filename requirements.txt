@@ -1,0 +1,3 @@
+# Everything you need locally to deploy, orchestrate, and analyze.
+modal
+numpy==1.26.4
