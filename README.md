@@ -8,24 +8,38 @@ asks whether the loss landscape registers the same event the geometry does.
 ## Result
 
 The days-of-week circle is one of the *earliest* features Pythia develops,
-forming within the first **~256–1000 steps**. In Pythia-160M its formation
-coincides — to within the checkpoint resolution — with an inflection in the
-**refined LLC at the layer where the circle lives**, but not with any
-discontinuity in the global LLC.
+forming within the first **~256–1000 steps**. That early-formation result is the
+supported one and holds across all four model sizes:
 
 | | 70M | 160M | 410M | 1B |
 |---|---|---|---|---|
 | Formation step t\* (`order_score` crosses 0.95) | 512 | 256 | 256 | 1000 |
 
+Everything below is exploratory. In Pythia-160M the formation step (t\* = 256) is
+*consistent with* an inflection in the refined LLC at layer 7, and not with any
+discontinuity in the global LLC:
+
 ```
-t* (geometric formation) = 256
-closest global LLC jump   = step 128   (-2.17σ)   |Δt| = 128
-closest rLLC(layer 7) jump = step 256  (-2.52σ)   |Δt| = 0   ← coincident
+t* (geometric formation)   = step 256
+closest global LLC jump    = step 128   (-2.17σ)   |Δt| = 128
+closest rLLC(layer 7) jump = step 256   (-2.52σ)   |Δt| = 0
 ```
 
-The rLLC inflection lands exactly on the geometric formation point; global LLC
-shows no co-located event. The signal is modest (-2.5σ) — tightening it past the
-checkpoint spacing would need denser checkpoints than Pythia publishes.
+Read this as one suggestive data point, not an established alignment. `analyze.py`
+marks rLLC second-difference outliers above 2σ (about 22 of them across training)
+and then reports the single candidate *nearest* the formation step. That is a
+post-hoc nearest-neighbor pick with no correction for multiple comparisons, and a
+|Δt| = 0 hit is not surprising on its own given how many candidates there are. The
+matched jump (-2.52σ) is also among the weakest in that list, near the 2σ cutoff.
+
+Two limits keep this from being a finding:
+
+- **n = 1.** LLC time series exist for one model (Pythia-160M) and one layer
+  (layer 7) only, so there is no null distribution to test against and nothing to
+  replicate on.
+- **Layer 7 is not read off the data.** The geometry's own best layer at the
+  formation step is L1 (it then wanders to L5/L4 at later steps), so fixing the
+  rLLC to layer 7 is an assumption, not a result.
 
 ## How it works
 
@@ -73,8 +87,8 @@ python3 analyze.py          # reproduces the result above, writes data/summary.j
 ./run.sh                    # deploy → spawn → poll → analyze
 ```
 
-LLC *absolute* values are SGLD seed/hardware-sensitive; the shape and the
-alignment reproduce, the exact ±values drift. `order_score` is coarse (a 7-bit
+LLC *absolute* values are SGLD seed/hardware-sensitive; the overall shape
+reproduces, the exact ±values drift. `order_score` is coarse (a 7-bit
 quantity) — `resid/r` in `data/summary.json` tells the same story, finer-grained.
 
 ## Layout
