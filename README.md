@@ -89,7 +89,7 @@ python3 analyze.py          # reproduces the result above, writes data/summary.j
 
 LLC *absolute* values are SGLD seed/hardware-sensitive; the overall shape
 reproduces, the exact ±values drift. `order_score` is coarse (a 7-bit
-quantity) — `resid/r` in `data/summary.json` tells the same story, finer-grained.
+quantity) — `resid/r` in `data/summary.json` shows the same result, finer-grained.
 
 ## Layout
 
